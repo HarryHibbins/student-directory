@@ -55,9 +55,19 @@ def process(selection)
     when "2"
       show_students()
     when "3"
-      save_students()
+     filename = get_file_name
+      if filename == ""
+          save_students
+      else
+          save_students(filename)
+      end
     when "4"
-      load_students()
+        filename = get_file_name
+        if filename == ""
+          puts "already loaded"
+        else
+          load_students_with_filename(filename)
+        end
     when "9"
       
       exit
@@ -65,6 +75,13 @@ def process(selection)
     else
       puts "I don't know what you meant, try again"
     end 
+    puts "#{selection} selected"
+end
+
+def get_file_name
+    puts "File name: "
+    filename = STDIN.gets.chomp
+    return filename
 end
 
 def show_students      
@@ -73,9 +90,9 @@ def show_students
     print_footer
 end
 
-def save_students
+def save_students(filename = "students.csv")
   # open the file for writing
-  file = File.open("students.csv",  "w")
+  file = File.open(filename,  "w")
   # iterate over each student
   @students.each do |student| 
     student_data = [student[:name], student[:cohort]]
@@ -94,7 +111,7 @@ def try_load_students
   end      
 end 
 
-def load_students_with_filename(filename)
+def load_students_with_filename(filename = "students.csv")
   if File.exist?(filename) # if it exists
     load_students(filename)
     puts "Loaded #{@students.count} from #{filename}"
@@ -105,13 +122,17 @@ end
 
 
 def load_students(filename = "students.csv")
-  file = File.open("students.csv", "r")
+  File.open(filename, "r") do |file|
+  #file = File.open("students.csv", "r")
   file.readlines.each do |line|
     name, cohort = line.chomp.split(',')
       @students << {name: name, cohort: cohort.to_sym}
   end 
-  file.close
+  end
 end 
+
+myCode = File.read($0)
+puts myCode
 
 try_load_students()
 interactive_menu()
